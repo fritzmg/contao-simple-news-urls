@@ -23,16 +23,31 @@ class SimpleNewsUrls
 	 */
 	public function getPageIdFromUrl( $arrFragments )
 	{
+		// check if there is exactly one fragment
 		if( count( $arrFragments ) == 1 )
 		{
 			// check if news item exists
 			if( ( $objNews = \NewsModel::findByAlias( $arrFragments[0] ) ) !== null )
 			{			
 				// check if jumpTo page exists
-				if( ( $objPage = \PageModel::findById( $objNews->getRelated('pid')->jumpTo ) ) !== null )
+				if( ( $objTarget = \PageModel::findWithDetails( $objNews->getRelated('pid')->jumpTo ) ) !== null )
 				{
+					// check if target page is in the right language
+					if( \Config::get('addLanguageToUrl') && $objTarget->rootLanguage != \Input::get('language') )
+					{
+						// return fragments without change
+						return $arrFragments;
+					}
+
+					// check if target page is in the right domain
+					if( $objTarget->domain && stripos( \Environment::get('host'), $objTarget->domain ) === false )
+					{
+						// return fragments without change
+						return $arrFragments;
+					}
+
 					// set fragments
-					$arrFragments[0] = $objPage->alias;
+					$arrFragments[0] = $objTarget->alias;
 					$arrFragments[1] = 'auto_item';
 					$arrFragments[2] = $objNews->alias;
 				}
@@ -55,7 +70,9 @@ class SimpleNewsUrls
 	{
 		// no params, no action
 		if( !$strParams )
+		{
 			return $strUrl;
+		}
 
 		// check if param is a news alias
 		if( ( $objNews = \NewsModel::findByAlias( ltrim( $strParams, '/' ) ) ) !== null )
@@ -95,7 +112,16 @@ class SimpleNewsUrls
 		}
 
 		// build url using only the news alias
-		return ( \Config::get('rewriteURL') ? '' : 'index.php/' ) . $strLanguage . $strAlias . \Config::get('urlSuffix');		
+		$strUrl = ( \Config::get('rewriteURL') ? '' : 'index.php/' ) . $strLanguage . $strAlias . \Config::get('urlSuffix');
+
+		// Add the domain if it differs from the current one
+		if( $arrPage['domain'] != '' && $arrPage['domain'] != \Environment::get('host') )
+		{
+			$strUrl = ($arrPage['rootUseSSL'] ? 'https://' : 'http://') . $arrPage['domain'] . TL_PATH . '/' . $strUrl;
+		}
+
+		// return the url
+		return $strUrl;		
 	}
 	
 }
