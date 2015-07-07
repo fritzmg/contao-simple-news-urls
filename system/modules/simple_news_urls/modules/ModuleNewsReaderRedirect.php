@@ -24,7 +24,9 @@ class ModuleNewsReaderRedirect extends \ModuleNewsReader
 
 			// remove language, if applicable
 			if( \Config::get('addLanguageToUrl') )
+			{
 				$request = substr( $request, 3 );
+			}
 
 			// check URL parameters
 			if( count( explode( '/', $request ) ) > 1 )
