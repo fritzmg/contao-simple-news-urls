@@ -23,12 +23,28 @@ class SimpleNewsUrls
 	 */
 	public function getPageIdFromUrl( $arrFragments )
 	{
-		// check if there is exactly one fragment
-		if( count( $arrFragments ) == 1 )
+		// extract alias from fragments
+		$alias = null;
+		// handle special case with i18nl10n (see #4)
+		if( in_array( 'i18nl10n', \ModuleLoader::getActive() ) && count( $arrFragments ) == 3 )
+		{
+			if( $arrFragments[0] == null && $arrFragments[1] == 'language' )
+			{
+				$alias = $arrFragments[2];
+			}
+		}
+		// otherwise check if there is exactly only one fragment
+		elseif( count( $arrFragments ) == 1 )
+		{
+			$alias = $arrFragments[0];
+		}
+
+		// check if an alias was extracted
+		if( $alias )
 		{
 			// check if news item exists
-			if( ( $objNews = \NewsModel::findByAlias( $arrFragments[0] ) ) !== null )
-			{			
+			if( ( $objNews = \NewsModel::findByAlias( $alias ) ) !== null )
+			{
 				// check if jumpTo page exists
 				if( ( $objTarget = \PageModel::findWithDetails( $objNews->getRelated('pid')->jumpTo ) ) !== null )
 				{
@@ -46,15 +62,13 @@ class SimpleNewsUrls
 						return $arrFragments;
 					}
 
-					// set fragments
-					$arrFragments[0] = $objTarget->alias;
-					$arrFragments[1] = 'auto_item';
-					$arrFragments[2] = $objNews->alias;
+					// return changed fragments
+					return array( $objTarget->alias, 'auto_item', $objNews->alias );
 				}
 			}
 		}
 
-		// return the fragments
+		// return fragments without change
 		return $arrFragments;
 	}
 
