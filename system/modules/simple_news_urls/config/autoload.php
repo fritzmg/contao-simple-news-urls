@@ -16,6 +16,5 @@
 // load classes
 ClassLoader::addClasses(array
 (
-	'SimpleNewsUrls'           => 'system/modules/simple_news_urls/classes/SimpleNewsUrls.php',
-	'ModuleNewsReaderRedirect' => 'system/modules/simple_news_urls/modules/ModuleNewsReaderRedirect.php'
+	'SimpleNewsUrls'           => 'system/modules/simple_news_urls/classes/SimpleNewsUrls.php'
 ));
