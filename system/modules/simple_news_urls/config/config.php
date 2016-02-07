@@ -17,9 +17,10 @@
 if( !\Config::get('useAutoItem') || \Config::get('disableAlias') )
 	return;
 
-// set new news reader
-$GLOBALS['FE_MOD']['news']['newsreader']  = 'ModuleNewsReaderRedirect';
-
 // set hooks
 $GLOBALS['TL_HOOKS']['getPageIdFromUrl'][] = array('SimpleNewsUrls','getPageIdFromUrl');
 $GLOBALS['TL_HOOKS']['generateFrontendUrl'][] = array('SimpleNewsUrls','generateFrontendUrl');
+$GLOBALS['TL_HOOKS']['parseArticles'][] = array('SimpleNewsUrls','parseArticles');
+
+// settings
+$GLOBALS['TL_CONFIG']['simpleNewsUrlsRedirect'] = 301;

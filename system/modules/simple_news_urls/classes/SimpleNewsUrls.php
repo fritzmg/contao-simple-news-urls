@@ -128,14 +128,62 @@ class SimpleNewsUrls
 		// build url using only the news alias
 		$strUrl = ( \Config::get('rewriteURL') ? '' : 'index.php/' ) . $strLanguage . $strAlias . \Config::get('urlSuffix');
 
-		// Add the domain if it differs from the current one
-		if( $arrPage['domain'] != '' && $arrPage['domain'] != \Environment::get('host') )
-		{
-			$strUrl = ($arrPage['rootUseSSL'] ? 'https://' : 'http://') . $arrPage['domain'] . TL_PATH . '/' . $strUrl;
-		}
+		// add the domain
+		$strUrl = ($arrPage['rootUseSSL'] ? 'https://' : 'http://') . ($arrPage['domain'] ?: \Environment::get('host')) . TL_PATH . '/' . $strUrl;
 
 		// return the url
 		return $strUrl;		
+	}
+
+
+	/**
+	 * parseArticles Hook to either generate a 301 redirect or a canonical URL
+	 * to the simple news URL to prevent duplicate URLs
+	 * @param array page data
+	 * @param string news alias
+	 */
+	public function parseArticles( $objTemplate, $arrArticle, \ModuleNews $objModule )
+	{
+		// check if module is a newsreader
+		if( $objModule->type != 'newsreader' )
+			return;
+
+		// check if auto item parameter matches the article
+		if( \Input::get('auto_item') != $arrArticle['alias'] )
+			return;
+
+		// get the request string
+		$request = \Environment::get('request');
+
+		// remove language, if applicable
+		if( \Config::get('addLanguageToUrl') )
+		{
+			$request = substr( $request, 3 );
+		}
+
+		// check URL parameters
+		if( count( explode( '/', $request ) ) > 1 )
+		{
+			/** @var \PageModel $objPage */
+			global $objPage;
+
+			// generate the url
+			$strUrl = self::buildUrl( $objPage->row(), \Input::get('auto_item') );
+
+			// check for redirect
+			$redirectType = \Config::get('simpleNewsUrlsRedirect');
+			switch( $redirectType )
+			{
+				// insert canonical meta tag
+				case 'canonical': $GLOBALS['TL_HEAD'][] = '<link rel="canonical" href="'. $strUrl .'">'; break;
+
+				// redirect to simple URL
+				case 301:
+				case 302:
+				case 303: \Controller::redirect( $strUrl, $redirectType ); break;
+				 default: \Controller::redirect( $strUrl, 301           ); break;
+			}
+		}
 	}
 	
 }
