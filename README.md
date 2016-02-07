@@ -19,7 +19,7 @@ This is done through Contao's `getPageIdFromUrl` hook. All links to news entries
 $GLOBALS['TL_CONFIG']['simpleNewsUrlsRedirect'] = '…';
 ```
 
-Valid values are `301`, `302`, `303` or `canonical`. The latter will not create a redirect, but insert a canonical tag into the `<head>` instead.
+Valid values are `301`, `302`, `303` or `'canonical'`. The latter will not create a redirect, but insert a canonical tag into the `<head>` instead.
 
 The extension also works with different URL suffixes, or none at all. 
 
