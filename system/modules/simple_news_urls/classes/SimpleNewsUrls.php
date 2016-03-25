@@ -112,7 +112,11 @@ class SimpleNewsUrls
 
 		if( \Config::get('addLanguageToUrl') )
 		{
-			if( isset( $arrPage['language'] ) && $arrPage['type'] == 'root' )
+			if( isset( $arrPage['rootLanguage'] ) )
+			{
+				$strLanguage = $arrPage['rootLanguage'] . '/';
+			}
+			elseif( isset( $arrPage['language'] ) && $arrPage['type'] == 'root' )
 			{
 				$strLanguage = $arrPage['language'] . '/';
 			}
