@@ -146,11 +146,11 @@ class SimpleNewsUrls
 	 * @param array page data
 	 * @param string news alias
 	 */
-	public function parseArticles( $objTemplate, $arrArticle, \ModuleNews $objModule )
+	public function parseArticles( $objTemplate, $arrArticle, $objModule )
 	{
-		// check if module is a newsreader
-		if( $objModule->type != 'newsreader' )
-			return;
+		// check for news module
+        if( strpos( get_class($objModule), 'ModuleNewsReader') === false )
+            return;
 
 		// check if auto item parameter matches the article
 		if( \Input::get('auto_item') != $arrArticle['alias'] )
