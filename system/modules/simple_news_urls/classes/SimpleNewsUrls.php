@@ -165,14 +165,17 @@ class SimpleNewsUrls
 			$request = substr( $request, 3 );
 		}
 
-		// check URL parameters
-		if( count( explode( '/', $request ) ) > 1 )
+		// check if news alias is at the beginning of url
+		if( stripos( $request, $arrArticle['alias'] ) !== 0 )
 		{
 			/** @var \PageModel $objPage */
 			global $objPage;
 
 			// generate the url
 			$strUrl = self::buildUrl( $objPage->row(), \Input::get('auto_item') );
+
+			// generate query string
+			$strQuery = \Environment::get('queryString') ? '?'.\Environment::get('queryString') : '';
 
 			// check for redirect
 			$redirectType = \Config::get('simpleNewsUrlsRedirect');
@@ -184,8 +187,8 @@ class SimpleNewsUrls
 				// redirect to simple URL
 				case 301:
 				case 302:
-				case 303: \Controller::redirect( $strUrl, $redirectType ); break;
-				 default: \Controller::redirect( $strUrl, 301           ); break;
+				case 303: \Controller::redirect( $strUrl . $strQuery, $redirectType ); break;
+				 default: \Controller::redirect( $strUrl . $strQuery, 301           );
 			}
 		}
 	}
