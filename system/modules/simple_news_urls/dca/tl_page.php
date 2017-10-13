@@ -33,7 +33,7 @@ class tl_page_simplenewsurls extends Backend
 				$objPage = \PageModel::findWithDetails( $dc->id );
 
 				// check if page is on the same domain and language
-				if( $objPage->domain == $objTarget->domain && ( \Config::get('addLanguageToUrl') && $objPage->rootLanguage == $objTarget->rootLanguage ) )
+				if( $objPage->domain == $objTarget->domain && ( !\Config::get('addLanguageToUrl') || $objPage->rootLanguage == $objTarget->rootLanguage ) )
 				{
 					// append id
 					$varValue.= '-' . $dc->id;
