@@ -3,7 +3,7 @@
 /**
  * Contao Open Source CMS
  *
- * simple extension to provide a share buttons module
+ * Simple Contao extension to allow news URLs without its reader page fragment.
  * 
  * @copyright inspiredminds 2015
  * @package   simple_news_urls
