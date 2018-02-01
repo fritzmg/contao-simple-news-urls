@@ -130,7 +130,7 @@ class SimpleNewsUrls
 		}
 
 		// build url using only the news alias
-		$strUrl = ( \Config::get('rewriteURL') ? '' : 'index.php/' ) . $strLanguage . $strAlias . \Config::get('urlSuffix');
+		$strUrl = ( \Config::get('rewriteURL') || class_exists('Contao\CoreBundle\ContaoCoreBundle') ? '' : 'index.php/' ) . $strLanguage . $strAlias . \Config::get('urlSuffix');
 
 		// add the domain
 		$strUrl = ($arrPage['rootUseSSL'] ? 'https://' : 'http://') . ($arrPage['domain'] ?: \Environment::get('host')) . TL_PATH . '/' . $strUrl;
