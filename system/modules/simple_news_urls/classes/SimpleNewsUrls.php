@@ -80,7 +80,7 @@ class SimpleNewsUrls
 	 * @param string URL parameters
 	 * @param string current URL
 	 */
-	public function generateFrontendUrl( $arrRow, $strParams, $strUrl )
+	public function generateFrontendUrl($arrRow, $strParams, $strUrl)
 	{
 		// no params, no action
 		if( !$strParams )
@@ -89,54 +89,14 @@ class SimpleNewsUrls
 		}
 
 		// check if param is a news alias
-		if( ( $objNews = \NewsModel::findByAlias( ltrim( $strParams, '/' ) ) ) !== null )
+		if (null !== ($objNews = \NewsModel::findByAlias(ltrim($strParams, '/'))))
 		{
-			// build url using only the news alias
-			$strUrl = self::buildUrl( $arrRow, $objNews->alias );
+			// remove the page alias from the URL
+			$strUrl = str_replace($arrRow['alias'] . '/', '', $strUrl);
 		}			
 
 		// return the url
 		return $strUrl;
-	}
-
-
-	/**
-	 * Helper function to build the simple news URL
-	 * @param array page data
-	 * @param string news alias
-	 */
-	public static function buildUrl( $arrPage, $strAlias )
-	{
-		// check for language
-		$strLanguage = '';
-
-		if( \Config::get('addLanguageToUrl') )
-		{
-			if( isset( $arrPage['rootLanguage'] ) )
-			{
-				$strLanguage = $arrPage['rootLanguage'] . '/';
-			}
-			elseif( isset( $arrPage['language'] ) && $arrPage['type'] == 'root' )
-			{
-				$strLanguage = $arrPage['language'] . '/';
-			}
-			elseif( TL_MODE == 'FE' )
-			{
-				/** @var \PageModel $objPage */
-				global $objPage;
-
-				$strLanguage = $objPage->rootLanguage . '/';
-			}
-		}
-
-		// build url using only the news alias
-		$strUrl = ( \Config::get('rewriteURL') || class_exists('Contao\CoreBundle\ContaoCoreBundle') ? '' : 'index.php/' ) . $strLanguage . $strAlias . \Config::get('urlSuffix');
-
-		// add the domain
-		$strUrl = ($arrPage['rootUseSSL'] ? 'https://' : 'http://') . ($arrPage['domain'] ?: \Environment::get('host')) . TL_PATH . '/' . $strUrl;
-
-		// return the url
-		return $strUrl;		
 	}
 
 
@@ -146,40 +106,47 @@ class SimpleNewsUrls
 	 * @param array page data
 	 * @param string news alias
 	 */
-	public function parseArticles( $objTemplate, $arrArticle, $objModule )
+	public function parseArticles($objTemplate, $arrArticle, $objModule)
 	{
 		// check for news module
-		if( strpos( get_class($objModule), 'ModuleNewsReader') === false )
+		if (!$objModule instanceof \ModuleNewsReader)
+		{
 			return;
+		}
 
 		// check if auto item parameter matches the article
-		if( \Input::get('auto_item') != $arrArticle['alias'] )
+		if (\Input::get('auto_item') != $arrArticle['alias'])
+		{
 			return;
+		}
 
-		// get the request string
-		$request = \Environment::get('request');
+		// get the current request string
+		$strRequest = \Environment::get('request');
 
 		// remove language, if applicable
-		if( \Config::get('addLanguageToUrl') )
+		if (\Config::get('addLanguageToUrl'))
 		{
-			$request = substr( $request, 3 );
+			$strRequest = substr($strRequest, 3);
 		}
 
 		// check if news alias is at the beginning of url
-		if( stripos( $request, $arrArticle['alias'] ) !== 0 )
+		if (stripos($strRequest, $arrArticle['alias']) !== 0)
 		{
 			/** @var \PageModel $objPage */
 			global $objPage;
 
-			// generate the url
-			$strUrl = self::buildUrl( $objPage->row(), \Input::get('auto_item') );
+			// generate the news URL
+			$strUrl = $objPage->getAbsoluteUrl('/' . $arrArticle['alias']);
+
+			// remove the page alias
+			$strUrl = str_replace($objPage->alias . '/', '', $strUrl);
 
 			// generate query string
 			$strQuery = \Environment::get('queryString') ? '?'.\Environment::get('queryString') : '';
 
 			// check for redirect
 			$redirectType = \Config::get('simpleNewsUrlsRedirect');
-			switch( $redirectType )
+			switch ($redirectType)
 			{
 				// insert canonical meta tag
 				case 'canonical': $GLOBALS['TL_HEAD'][] = '<link rel="canonical" href="'. $strUrl .'">'; break;
@@ -187,10 +154,9 @@ class SimpleNewsUrls
 				// redirect to simple URL
 				case 301:
 				case 302:
-				case 303: \Controller::redirect( $strUrl . $strQuery, $redirectType ); break;
-				 default: \Controller::redirect( $strUrl . $strQuery, 301           );
+				case 303: \Controller::redirect($strUrl . $strQuery, $redirectType); break;
+				 default: \Controller::redirect($strUrl . $strQuery, 301          );
 			}
 		}
 	}
-	
 }
