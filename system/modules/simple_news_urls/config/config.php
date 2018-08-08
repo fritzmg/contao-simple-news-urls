@@ -21,6 +21,7 @@ if( !\Config::get('useAutoItem') || \Config::get('disableAlias') )
 $GLOBALS['TL_HOOKS']['getPageIdFromUrl'][] = array('SimpleNewsUrls','getPageIdFromUrl');
 $GLOBALS['TL_HOOKS']['generateFrontendUrl'][] = array('SimpleNewsUrls','generateFrontendUrl');
 $GLOBALS['TL_HOOKS']['parseArticles'][] = array('SimpleNewsUrls','parseArticles');
+$GLOBALS['TL_HOOKS']['getSearchablePages'][] = array('SimpleNewsUrls', 'getSearchablePages');
 
 // settings
 $GLOBALS['TL_CONFIG']['simpleNewsUrlsRedirect'] = 301;

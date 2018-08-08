@@ -76,9 +76,10 @@ class SimpleNewsUrls
 	/**
 	 * generateFrontendUrl Hook
 	 * checks if the parameter for the generated URL is a news alias and rewrites the URL without its page alias
-	 * @param array page data
-	 * @param string URL parameters
-	 * @param string current URL
+	 * @param  array page data
+	 * @param  string URL parameters
+	 * @param  string current URL
+	 * @return string
 	 */
 	public function generateFrontendUrl($arrRow, $strParams, $strUrl)
 	{
@@ -93,10 +94,38 @@ class SimpleNewsUrls
 		{
 			// remove the page alias from the URL
 			$strUrl = str_replace($arrRow['alias'] . '/', '', $strUrl);
-		}			
+		}	
 
 		// return the url
 		return $strUrl;
+	}
+
+
+	/**
+	 * Remove page path from searchable pages for news entries.
+	 * @param  array   $arrPages
+	 * @param  integer $intRoot
+	 * @param  boolean $blnIsSitemap
+	 * @return array
+	 */
+	public function getSearchablePages($arrPages, $intRoot = 0, $blnIsSitemap = false)
+	{
+		// get all news archives
+		if (null !== $objArchive = \NewsArchiveModel::findAll())
+		{
+			while ($objArchive->next())
+			{
+				if ($objArchive->jumpTo && null !== ($objTarget = $objArchive->getRelated('jumpTo')))
+				{
+					foreach ($arrPages as &$page)
+					{
+						$page = str_replace($objTarget->alias . '/', '', $page);
+					}
+				}
+			}
+		}
+
+		return $arrPages;
 	}
 
 
