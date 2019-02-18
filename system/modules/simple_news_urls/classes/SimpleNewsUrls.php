@@ -159,7 +159,7 @@ class SimpleNewsUrls
 		}
 
 		// check if news alias is at the beginning of url
-		if (stripos($strRequest, $arrArticle['alias']) !== 0)
+		if (stripos(str_replace('app_dev.php/', '', $strRequest), $arrArticle['alias']) !== 0)
 		{
 			/** @var \PageModel $objPage */
 			global $objPage;
