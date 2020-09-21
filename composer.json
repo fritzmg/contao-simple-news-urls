@@ -19,6 +19,12 @@
         "source":"https://github.com/fritzmg/contao-simple-news-urls",
         "forum":"https://community.contao.org/de"
     },
+    "funding": [
+        {
+            "type": "github",
+            "url": "https://github.com/sponsors/fritzmg"
+        }
+    ],
     "require":{
         "php":">=5.2",
         "contao/core-bundle":"^3.1|^4.4",
