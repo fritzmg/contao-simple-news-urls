@@ -12,6 +12,7 @@
  * @license   GPL-2.0
  */
 
+use Contao\Environment;
 
 class SimpleNewsUrls
 {
@@ -56,7 +57,7 @@ class SimpleNewsUrls
 					}
 
 					// check if target page is in the right domain
-					if( $objTarget->domain && stripos( \Environment::get('host'), $objTarget->domain ) === false )
+					if( $objTarget->domain && stripos( Environment::get('host'), $objTarget->domain ) === false )
 					{
 						// return fragments without change
 						return $arrFragments;
@@ -150,7 +151,10 @@ class SimpleNewsUrls
 		}
 
 		// get the current request string
-		$strRequest = \Environment::get('request');
+		$strRequest = Environment::get('requestUri');
+
+		// remove script name
+		$strRequest = preg_replace('~^'.Environment::get('scriptName').'/~', '', $strRequest);
 
 		// remove language, if applicable
 		if (\Config::get('addLanguageToUrl'))
@@ -159,7 +163,7 @@ class SimpleNewsUrls
 		}
 
 		// check if news alias is at the beginning of url
-		if (stripos(str_replace('app_dev.php/', '', $strRequest), $arrArticle['alias']) !== 0)
+		if (stripos(urldecode($strRequest), $arrArticle['alias']) !== 0)
 		{
 			/** @var \PageModel $objPage */
 			global $objPage;
@@ -171,7 +175,7 @@ class SimpleNewsUrls
 			$strUrl = str_replace($objPage->alias . '/', '', $strUrl);
 
 			// generate query string
-			$strQuery = \Environment::get('queryString') ? '?'.\Environment::get('queryString') : '';
+			$strQuery = Environment::get('queryString') ? '?'.Environment::get('queryString') : '';
 
 			// check for redirect
 			$redirectType = \Config::get('simpleNewsUrlsRedirect');
