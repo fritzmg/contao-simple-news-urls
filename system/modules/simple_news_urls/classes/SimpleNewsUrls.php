@@ -12,7 +12,14 @@
  * @license   GPL-2.0
  */
 
+use Contao\Config;
+use Contao\Controller;
 use Contao\Environment;
+use Contao\ModuleLoader;
+use Contao\ModuleNewsReader;
+use Contao\NewsArchiveModel;
+use Contao\NewsModel;
+use Contao\PageModel;
 
 class SimpleNewsUrls
 {
@@ -27,7 +34,7 @@ class SimpleNewsUrls
 		// extract alias from fragments
 		$alias = null;
 		// handle special case with i18nl10n (see #4)
-		if( in_array( 'i18nl10n', \ModuleLoader::getActive() ) && count( $arrFragments ) == 3 )
+		if( in_array( 'i18nl10n', ModuleLoader::getActive() ) && count( $arrFragments ) == 3 )
 		{
 			if( $arrFragments[0] == null && $arrFragments[1] == 'language' )
 			{
@@ -44,13 +51,13 @@ class SimpleNewsUrls
 		if( $alias )
 		{
 			// check if news item exists
-			if( ( $objNews = \NewsModel::findByAlias( $alias ) ) !== null )
+			if( ( $objNews = NewsModel::findByAlias( $alias ) ) !== null )
 			{
 				// check if jumpTo page exists
-				if( ( $objTarget = \PageModel::findWithDetails( $objNews->getRelated('pid')->jumpTo ) ) !== null )
+				if( ( $objTarget = PageModel::findWithDetails( $objNews->getRelated('pid')->jumpTo ) ) !== null )
 				{
 					// check if target page is in the right language
-					if( \Config::get('addLanguageToUrl') && $objTarget->rootLanguage != \Input::get('language') )
+					if( Config::get('addLanguageToUrl') && $objTarget->rootLanguage != \Input::get('language') )
 					{
 						// return fragments without change
 						return $arrFragments;
@@ -91,7 +98,7 @@ class SimpleNewsUrls
 		}
 
 		// check if param is a news alias
-		if (null !== ($objNews = \NewsModel::findByAlias(ltrim($strParams, '/'))))
+		if (null !== ($objNews = NewsModel::findByAlias(ltrim($strParams, '/'))))
 		{
 			// remove the page alias from the URL
 			$strUrl = str_replace($arrRow['alias'] . '/', '', $strUrl);
@@ -112,7 +119,7 @@ class SimpleNewsUrls
 	public function getSearchablePages($arrPages, $intRoot = 0, $blnIsSitemap = false)
 	{
 		// get all news archives
-		if (null !== $objArchive = \NewsArchiveModel::findAll())
+		if (null !== $objArchive = NewsArchiveModel::findAll())
 		{
 			while ($objArchive->next())
 			{
@@ -139,7 +146,7 @@ class SimpleNewsUrls
 	public function parseArticles($objTemplate, $arrArticle, $objModule)
 	{
 		// check for news module
-		if (!$objModule instanceof \ModuleNewsReader)
+		if (!$objModule instanceof ModuleNewsReader)
 		{
 			return;
 		}
@@ -157,7 +164,7 @@ class SimpleNewsUrls
 		$strRequest = preg_replace('~^'.Environment::get('scriptName').'/~', '', $strRequest);
 
 		// remove language, if applicable
-		if (\Config::get('addLanguageToUrl'))
+		if (Config::get('addLanguageToUrl'))
 		{
 			$strRequest = substr($strRequest, 3);
 		}
@@ -165,7 +172,7 @@ class SimpleNewsUrls
 		// check if news alias is at the beginning of url
 		if (stripos(urldecode($strRequest), $arrArticle['alias']) !== 0)
 		{
-			/** @var \PageModel $objPage */
+			/** @var PageModel $objPage */
 			global $objPage;
 
 			// generate the news URL
@@ -178,7 +185,7 @@ class SimpleNewsUrls
 			$strQuery = Environment::get('queryString') ? '?'.Environment::get('queryString') : '';
 
 			// check for redirect
-			$redirectType = \Config::get('simpleNewsUrlsRedirect');
+			$redirectType = Config::get('simpleNewsUrlsRedirect');
 			switch ($redirectType)
 			{
 				// insert canonical meta tag
@@ -187,8 +194,8 @@ class SimpleNewsUrls
 				// redirect to simple URL
 				case 301:
 				case 302:
-				case 303: \Controller::redirect($strUrl . $strQuery, $redirectType); break;
-				 default: \Controller::redirect($strUrl . $strQuery, 301          );
+				case 303: Controller::redirect($strUrl . $strQuery, $redirectType); break;
+				 default: Controller::redirect($strUrl . $strQuery, 301          );
 			}
 		}
 	}
