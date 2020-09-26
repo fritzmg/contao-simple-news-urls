@@ -161,7 +161,7 @@ class SimpleNewsUrls
 		$strRequest = Environment::get('requestUri');
 
 		// remove script name
-		$strRequest = preg_replace('~^'.Environment::get('scriptName').'/~', '', $strRequest);
+		$strRequest = ltrim(preg_replace('~^'.Environment::get('scriptName').'/~', '', $strRequest), '/');
 
 		// remove language, if applicable
 		if (Config::get('addLanguageToUrl'))
