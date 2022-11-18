@@ -10,13 +10,13 @@ declare(strict_types=1);
  * @license LGPL-3.0-or-later
  */
 
-namespace InspiredMinds\ContaoSimpleNewsUrlsBundle\ContaoManager;
+namespace InspiredMinds\ContaoSimpleNewsUrls\ContaoManager;
 
 use Contao\ManagerPlugin\Bundle\BundlePluginInterface;
 use Contao\ManagerPlugin\Bundle\Config\BundleConfig;
 use Contao\ManagerPlugin\Bundle\Parser\ParserInterface;
 use Contao\NewsBundle\ContaoNewsBundle;
-use InspiredMinds\ContaoSimpleNewsUrlsBundle\ContaoSimpleNewsUrlsBundle;
+use InspiredMinds\ContaoSimpleNewsUrls\ContaoSimpleNewsUrlsBundle;
 
 class Plugin implements BundlePluginInterface
 {
