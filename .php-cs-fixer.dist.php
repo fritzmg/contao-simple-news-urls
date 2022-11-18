@@ -10,6 +10,7 @@ EOF;
 
 $finder = PhpCsFixer\Finder::create()
     ->in([
+        __DIR__.'/contao',
         __DIR__.'/src',
     ])
 ;
