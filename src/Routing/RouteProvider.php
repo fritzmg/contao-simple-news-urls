@@ -49,6 +49,7 @@ class RouteProvider implements RouteProviderInterface
         $this->addRouteForNews($news[0], $routes);
         $collection->add($name, $routes[$name]);
 
+        // Manually set the auto_item to the news alias, so that the newsreader module still works
         Input::setGet('auto_item', $alias);
 
         return $collection;
@@ -122,8 +123,14 @@ class RouteProvider implements RouteProviderInterface
             return;
         }
 
+        // Register a new page route for this page under the news alias
         $route = new PageRoute($page, '/'.$news['alias']);
+
+        // News URLs are supposed to be example.com/<news-alias>
         $route->setUrlPrefix('');
+        $route->setUrlSuffix('');
+
+        // Override the requireItem config for this page (otherwise Contao\FrontendIndex will throw a 404 exception)
         $route->getPageModel()->requireItem = false;
 
         $routes['tl_news.'.$news['alias']] = $route;
