@@ -13,8 +13,6 @@ declare(strict_types=1);
 namespace InspiredMinds\ContaoSimpleNewsUrls\Routing;
 
 use Contao\CoreBundle\Framework\ContaoFramework;
-use Contao\CoreBundle\Routing\Page\PageRoute;
-use Contao\Input;
 use Contao\PageModel;
 use Doctrine\DBAL\Connection;
 use Symfony\Cmf\Component\Routing\RouteProviderInterface;
@@ -48,9 +46,6 @@ class RouteProvider implements RouteProviderInterface
         $routes = [];
         $this->addRouteForNews($news[0], $routes);
         $collection->add($name, $routes[$name]);
-
-        // Manually set the auto_item to the news alias, so that the newsreader module still works
-        Input::setGet('auto_item', $alias);
 
         return $collection;
     }
@@ -123,16 +118,15 @@ class RouteProvider implements RouteProviderInterface
             return;
         }
 
+        $name = 'tl_news.'.$news['alias'];
+
         // Register a new page route for this page under the news alias
-        $route = new PageRoute($page, '/'.$news['alias']);
+        $route = new NewsRoute($page, '/'.$news['alias'], ['_canonical_route' => $name]);
 
         // News URLs are supposed to be example.com/<news-alias>
         $route->setUrlPrefix('');
         $route->setUrlSuffix('');
 
-        // Override the requireItem config for this page (otherwise Contao\FrontendIndex will throw a 404 exception)
-        $route->getPageModel()->requireItem = false;
-
-        $routes['tl_news.'.$news['alias']] = $route;
+        $routes[$name] = $route;
     }
 }
