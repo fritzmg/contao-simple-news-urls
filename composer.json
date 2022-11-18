@@ -4,7 +4,7 @@
     "keywords":["contao", "news", "urls"],
     "type":"contao-module",
     "homepage":"https://github.com/fritzmg/contao-simple-news-urls",
-    "license":"GPL-2.0-only",
+    "license":"LGPL-3.0-or-later",
     "authors":[
         {
             "name":"Fritz Michael Gschwantner",
@@ -26,18 +26,18 @@
         }
     ],
     "require":{
-        "php":">=5.2",
-        "contao/core-bundle":"^3.1|^4.4",
-        "contao-community-alliance/composer-plugin":"^2.4|^3.0"
+        "php": ">=7.4",
+        "contao/news-bundle": "^4.13 || ^5.0"
     },
-    "replace": {
-        "contao-legacy/simple_news_urls": "self.version"
-    },
-    "extra":{
-        "contao":{
-            "sources":{
-                "system/modules/simple_news_urls":"system/modules/simple_news_urls"
-            }
+    "autoload": {
+        "psr-4": {
+            "InspiredMinds\\ContaoSimpleNewsUrlsBundle\\": "src/"
         }
+    },
+    "extra": {
+        "contao-manager-plugin": "InspiredMinds\\ContaoSimpleNewsUrlsBundle\\ContaoManager\\Plugin"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^3.0"
     }
 }
