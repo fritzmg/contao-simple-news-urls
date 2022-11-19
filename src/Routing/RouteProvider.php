@@ -25,6 +25,8 @@ class RouteProvider implements RouteProviderInterface
 {
     private $db;
     private $framework;
+    private static $routes = [];
+    private static $allLoaded = false;
 
     public function __construct(Connection $db, ContaoFramework $framework)
     {
@@ -36,47 +38,86 @@ class RouteProvider implements RouteProviderInterface
     {
         $collection = new RouteCollection();
         $alias = substr($request->getPathInfo(), 1);
-        $name = 'tl_news.'.$alias;
-        $news = $this->getEnabledNews([$name]);
 
-        if (empty($news)) {
+        // We are only interested in URLs with one fragment
+        if (count(explode('/', $alias)) > 1) {
             return $collection;
         }
 
-        $routes = [];
-        $this->addRouteForNews($news[0], $routes);
-        $collection->add($name, $routes[$name]);
+        $name = 'tl_news.'.$alias;
+
+        try {
+            $route = $this->getRouteByName($name);
+
+            $collection->add($name, $route);
+        } catch (RouteNotFoundException $e) {
+            // Do nothing
+        }
 
         return $collection;
     }
 
     public function getRouteByName($name): Route
     {
+        if (0 !== strncmp($name, 'tl_news.', 8)) {
+            throw new RouteNotFoundException('Route name is not a news entry.');
+        }
+
+        if (isset(self::$routes[$name])) {
+            return self::$routes[$name];
+        }
+
+        if (self::$allLoaded) {
+            throw new RouteNotFoundException('Route "'.$name.'" not found');
+        }
+
         $news = $this->getEnabledNews([$name]);
 
         if (empty($news)) {
             throw new RouteNotFoundException('Route name does not match a news entry.');
         }
 
-        $routes = [];
+        $this->addRouteForNews($news[0]);
 
-        $this->addRouteForNews($news[0], $routes);
-
-        if (!\array_key_exists($name, $routes)) {
+        if (!\array_key_exists($name, self::$routes)) {
             throw new RouteNotFoundException('Route "'.$name.'" not found');
         }
 
-        return $routes[$name];
+        return self::$routes[$name];
     }
 
     public function getRoutesByNames($names): array
     {
-        $news = $this->getEnabledNews($names);
+        if (null === $names) {
+            if (self::$allLoaded) {
+                return self::$routes;
+            }
+
+            $news = $this->getEnabledNews();
+
+            foreach ($news as $entry) {
+                $this->addRouteForNews($entry);
+            }
+
+            self::$allLoaded = true;
+
+            return self::$routes;
+        }
 
         $routes = [];
 
-        foreach ($news as $entry) {
-            $this->addRouteForNews($entry, $routes);
+        foreach ($names as $name) {
+            if (!isset(self::$routes[$name])) {
+                $news = $this->getEnabledNews($names);
+
+                foreach ($news as $entry) {
+                    $this->addRouteForNews($entry);
+                }
+            }
+
+            if (isset(self::$routes[$name])) {
+                $routes[$name] = self::$routes[$name];
+            }
         }
 
         return $routes;
@@ -108,8 +149,14 @@ class RouteProvider implements RouteProviderInterface
         return $this->db->fetchAllAssociative($query, $values);
     }
 
-    private function addRouteForNews(array $news, array &$routes): void
+    private function addRouteForNews(array $news): void
     {
+        $name = 'tl_news.'.$news['alias'];
+
+        if (isset(self::$routes[$name])) {
+            return;
+        }
+
         $this->framework->initialize(true);
 
         $page = PageModel::findByPk($news['archiveJumpTo']);
@@ -118,8 +165,6 @@ class RouteProvider implements RouteProviderInterface
             return;
         }
 
-        $name = 'tl_news.'.$news['alias'];
-
         // Register a new page route for this page under the news alias
         $route = new NewsRoute($page, '/'.$news['alias'], ['_canonical_route' => $name]);
 
@@ -127,6 +172,6 @@ class RouteProvider implements RouteProviderInterface
         $route->setUrlPrefix('');
         $route->setUrlSuffix('');
 
-        $routes[$name] = $route;
+        self::$routes[$name] = $route;
     }
 }
