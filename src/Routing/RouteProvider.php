@@ -44,7 +44,7 @@ class RouteProvider implements RouteProviderInterface
             return $collection;
         }
 
-        $name = 'tl_news.'.$alias;
+        $name = 'tl_news.'.rawurldecode($alias);
 
         try {
             $route = $this->getRouteByName($name);
