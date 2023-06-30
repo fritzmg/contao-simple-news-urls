@@ -142,7 +142,7 @@ class RouteProvider implements RouteProviderInterface
                 [, $alias] = explode('.', $name);
 
                 $query .= ' AND tl_news.alias = ?';
-                $values[] = rawurldecode($alias);
+                $values[] = $alias;
             }
         }
 
@@ -151,7 +151,7 @@ class RouteProvider implements RouteProviderInterface
 
     private function addRouteForNews(array $news): void
     {
-        $name = 'tl_news.'.rawurlencode($news['alias']);
+        $name = 'tl_news.'.$news['alias'];
 
         if (isset(self::$routes[$name])) {
             return;
@@ -166,7 +166,7 @@ class RouteProvider implements RouteProviderInterface
         }
 
         // Register a new page route for this page under the news alias
-        $route = new NewsRoute($page, '/'.rawurlencode($news['alias']), ['_canonical_route' => $name]);
+        $route = new NewsRoute($page, '/'.$news['alias'], ['_canonical_route' => $name]);
 
         // News URLs are supposed to be example.com/<news-alias>
         $route->setUrlPrefix('');
