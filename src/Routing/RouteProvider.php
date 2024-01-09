@@ -34,7 +34,7 @@ class RouteProvider implements RouteProviderInterface
         $this->framework = $framework;
     }
 
-    public function getRouteCollectionForRequest(Request $request)
+    public function getRouteCollectionForRequest(Request $request): RouteCollection
     {
         $collection = new RouteCollection();
         $alias = substr($request->getPathInfo(), 1);
@@ -86,7 +86,7 @@ class RouteProvider implements RouteProviderInterface
         return self::$routes[$name];
     }
 
-    public function getRoutesByNames($names): array
+    public function getRoutesByNames(?array $names = null): iterable
     {
         if (null === $names) {
             if (self::$allLoaded) {
