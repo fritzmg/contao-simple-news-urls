@@ -151,6 +151,10 @@ class RouteProvider implements RouteProviderInterface
 
     private function addRouteForNews(array $news): void
     {
+        if (!$news['alias']) {
+            return;
+        }
+
         $name = 'tl_news.'.$news['alias'];
 
         if (isset(self::$routes[$name])) {
