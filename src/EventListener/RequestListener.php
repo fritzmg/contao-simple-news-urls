@@ -14,12 +14,10 @@ namespace InspiredMinds\ContaoSimpleNewsUrls\EventListener;
 
 use Contao\Input;
 use InspiredMinds\ContaoSimpleNewsUrls\Routing\NewsRoute;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
-use Terminal42\ServiceAnnotationBundle\Annotation\ServiceTag;
 
-/**
- * @ServiceTag("kernel.event_listener")
- */
+#[AsEventListener]
 class RequestListener
 {
     public function __invoke(RequestEvent $event): void
