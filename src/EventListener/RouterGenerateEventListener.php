@@ -16,14 +16,14 @@ use Contao\CoreBundle\Routing\Page\PageRoute;
 use Contao\NewsArchiveModel;
 use Contao\NewsModel;
 use Contao\PageModel;
+use Symfony\Cmf\Component\Routing\Event\Events;
 use Symfony\Cmf\Component\Routing\Event\RouterGenerateEvent;
-use Terminal42\ServiceAnnotationBundle\Annotation\ServiceTag;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 /**
  * Adjusts the dynamic route for news URLs.
- *
- * @ServiceTag("kernel.event_listener", event="cmf_routing.pre_dynamic_generate")
  */
+#[AsEventListener(Events::PRE_DYNAMIC_GENERATE)]
 class RouterGenerateEventListener
 {
     private static $pageEnabled = [];
