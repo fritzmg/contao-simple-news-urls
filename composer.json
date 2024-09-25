@@ -27,8 +27,8 @@
     ],
     "require":{
         "php": ">=7.4",
-        "contao/core-bundle": "^5.0",
-        "contao/news-bundle": "^5.0",
+        "contao/core-bundle": "^5.3",
+        "contao/news-bundle": "^5.3",
         "doctrine/dbal": "^3.0",
         "symfony/config": "^6.4 || ^7.1",
         "symfony/dependency-injection": "^6.4 || ^7.1",

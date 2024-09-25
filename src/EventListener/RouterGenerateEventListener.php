@@ -15,7 +15,6 @@ namespace InspiredMinds\ContaoSimpleNewsUrls\EventListener;
 use Contao\CoreBundle\Routing\Page\PageRoute;
 use Contao\NewsArchiveModel;
 use Contao\NewsModel;
-use Contao\PageModel;
 use Symfony\Cmf\Component\Routing\Event\Events;
 use Symfony\Cmf\Component\Routing\Event\RouterGenerateEvent;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
@@ -33,18 +32,18 @@ class RouterGenerateEventListener
         $params = $event->getParameters();
 
         // Check if this route is applicable
-        if (!isset($params['_content']) || !$params['_content'] instanceof PageModel || empty($params['parameters'])) {
+        if (!($pageRoute = ($params['_route_object'] ?? null)) instanceof PageRoute || empty($params['parameters'])) {
             return;
         }
 
         // Check if we have a single parameter (the news alias)
-        $paramFragments = explode('/', mb_substr($params['parameters'], 1));
+        $fragments = explode('/', ltrim($params['parameters'], '/'));
 
-        if (\count($paramFragments) > 1) {
+        if (\count($fragments) > 1) {
             return;
         }
 
-        $page = $params['_content'];
+        $page = $pageRoute->getPageModel();
 
         // Check if page is target page for a simple URLs enabled news archive
         if (!isset(self::$pageEnabled[(int) $page->id])) {
@@ -56,18 +55,12 @@ class RouterGenerateEventListener
         }
 
         // Find a news via its alias
-        $news = NewsModel::findByAlias($paramFragments[0]);
-
-        if (null === $news) {
+        if (!$news = NewsModel::findByAlias($fragments[0])) {
             return;
         }
 
-        // Adjust the route
-        $route = new PageRoute($params['_content'], '/'.$news->alias);
-        $route->setUrlPrefix('');
-        $route->setUrlSuffix('');
-
-        $event->setRoute($route);
+        // Point to route
+        $event->setRoute('tl_news.'.$news->alias);
         $event->setParameters([]);
     }
 }
