@@ -3,11 +3,7 @@
 declare(strict_types=1);
 
 /*
- * This file is part of the Contao Simple News URLs extension.
- *
- * (c) inspiredminds
- *
- * @license LGPL-3.0-or-later
+ * (c) INSPIRED MINDS
  */
 
 namespace InspiredMinds\ContaoSimpleNewsUrls\EventListener;
@@ -29,7 +25,7 @@ class RequestListener
         }
 
         // Manually set the auto_item to the news alias, so that the newsreader module still works
-        [, $alias] = explode('.', $request->attributes->get('_canonical_route'));
+        [, $alias] = explode('.', (string) $request->attributes->get('_canonical_route'));
         Input::setGet('auto_item', $alias);
     }
 }

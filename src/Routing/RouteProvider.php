@@ -3,11 +3,7 @@
 declare(strict_types=1);
 
 /*
- * This file is part of the Contao Simple News URLs extension.
- *
- * (c) inspiredminds
- *
- * @license LGPL-3.0-or-later
+ * (c) INSPIRED MINDS
  */
 
 namespace InspiredMinds\ContaoSimpleNewsUrls\Routing;
@@ -23,15 +19,14 @@ use Symfony\Component\Routing\RouteCollection;
 
 class RouteProvider implements RouteProviderInterface
 {
-    private $db;
-    private $framework;
     private static $routes = [];
+
     private static $allLoaded = false;
 
-    public function __construct(Connection $db, ContaoFramework $framework)
-    {
-        $this->db = $db;
-        $this->framework = $framework;
+    public function __construct(
+        private readonly Connection $db,
+        private readonly ContaoFramework $framework,
+    ) {
     }
 
     public function getRouteCollectionForRequest(Request $request): RouteCollection
@@ -40,7 +35,7 @@ class RouteProvider implements RouteProviderInterface
         $alias = substr($request->getPathInfo(), 1);
 
         // We are only interested in URLs with one fragment
-        if (count(explode('/', $alias)) > 1) {
+        if (\count(explode('/', $alias)) > 1) {
             return $collection;
         }
 
@@ -50,7 +45,7 @@ class RouteProvider implements RouteProviderInterface
             $route = $this->getRouteByName($name);
 
             $collection->add($name, $route);
-        } catch (RouteNotFoundException $e) {
+        } catch (RouteNotFoundException) {
             // Do nothing
         }
 
@@ -59,7 +54,7 @@ class RouteProvider implements RouteProviderInterface
 
     public function getRouteByName($name): Route
     {
-        if (0 !== strncmp($name, 'tl_news.', 8)) {
+        if (!str_starts_with((string) $name, 'tl_news.')) {
             throw new RouteNotFoundException('Route name is not a news entry.');
         }
 
@@ -73,7 +68,7 @@ class RouteProvider implements RouteProviderInterface
 
         $news = $this->getEnabledNews([$name]);
 
-        if (empty($news)) {
+        if ([] === $news) {
             throw new RouteNotFoundException('Route name does not match a news entry.');
         }
 
@@ -86,7 +81,7 @@ class RouteProvider implements RouteProviderInterface
         return self::$routes[$name];
     }
 
-    public function getRoutesByNames(?array $names = null): iterable
+    public function getRoutesByNames(array|null $names = null): iterable
     {
         if (null === $names) {
             if (self::$allLoaded) {
@@ -123,7 +118,7 @@ class RouteProvider implements RouteProviderInterface
         return $routes;
     }
 
-    private function getEnabledNews(array $names = null): array
+    private function getEnabledNews(array|null $names = null): array
     {
         $values = [];
         $query = '
@@ -133,17 +128,15 @@ class RouteProvider implements RouteProviderInterface
                AND tl_news_archive.enable_simple_urls = 1
         ';
 
-        if ($names) {
-            foreach ($names as $name) {
-                if (0 !== strncmp($name, 'tl_news.', 8)) {
-                    continue;
-                }
-
-                [, $alias] = explode('.', $name);
-
-                $query .= ' AND tl_news.alias = ?';
-                $values[] = $alias;
+        foreach ($names ?? [] as $name) {
+            if (!str_starts_with((string) $name, 'tl_news.')) {
+                continue;
             }
+
+            [, $alias] = explode('.', (string) $name);
+
+            $query .= ' AND tl_news.alias = ?';
+            $values[] = $alias;
         }
 
         return $this->db->fetchAllAssociative($query, $values);
@@ -161,11 +154,9 @@ class RouteProvider implements RouteProviderInterface
             return;
         }
 
-        $this->framework->initialize(true);
+        $this->framework->initialize();
 
-        $page = PageModel::findByPk($news['archiveJumpTo']);
-
-        if (null === $page) {
+        if (!$page = PageModel::findById($news['archiveJumpTo'])) {
             return;
         }
 

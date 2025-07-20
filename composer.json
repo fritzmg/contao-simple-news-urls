@@ -1,23 +1,21 @@
 {
-    "name":"fritzmg/contao-simple-news-urls",
-    "description":"Simple Contao extension to allow news URLs without its reader page fragment",
-    "keywords":["contao", "news", "urls"],
-    "type":"contao-module",
-    "homepage":"https://github.com/fritzmg/contao-simple-news-urls",
-    "license":"LGPL-3.0-or-later",
-    "authors":[
+    "name": "fritzmg/contao-simple-news-urls",
+    "description": "Simple Contao extension to allow news URLs without its reader page fragment",
+    "keywords": ["contao", "news", "urls"],
+    "type": "contao-module",
+    "homepage": "https://github.com/fritzmg/contao-simple-news-urls",
+    "license": "LGPL-3.0-or-later",
+    "authors": [
         {
-            "name":"Fritz Michael Gschwantner",
-            "homepage":"http://www.inspiredminds.at",
-            "email":"fmg@inspiredminds.at",
-            "role":"Developer"
+            "name": "Fritz Michael Gschwantner",
+            "homepage": "http://www.inspiredminds.at",
+            "email": "fmg@inspiredminds.at",
+            "role": "Developer"
         }
     ],
     "support":{
-        "email":"fmg@inspiredminds.at",
         "issues":"https://github.com/fritzmg/contao-simple-news-urls/issues",
-        "source":"https://github.com/fritzmg/contao-simple-news-urls",
-        "forum":"https://community.contao.org/de"
+        "source":"https://github.com/fritzmg/contao-simple-news-urls"
     },
     "funding": [
         {
@@ -25,16 +23,17 @@
             "url": "https://github.com/sponsors/fritzmg"
         }
     ],
-    "require":{
-        "php": ">=7.4",
+    "require": {
+        "php": ">=8.2",
         "contao/core-bundle": "^5.3",
         "contao/news-bundle": "^5.3",
-        "doctrine/dbal": "^3.0",
-        "symfony/config": "^6.4 || ^7.1",
-        "symfony/dependency-injection": "^6.4 || ^7.1",
-        "symfony/http-foundation": "^6.4 || ^7.1",
-        "symfony/http-kernel": "^6.4 || ^7.1",
-        "symfony/routing": "^6.4 || ^7.1",
+        "doctrine/dbal": "^3.0 || ^4.0",
+        "symfony/config": "^6.4 || ^7.3",
+        "symfony/event-dispatcher": "^6.4 || ^7.3",
+        "symfony/dependency-injection": "^6.4 || ^7.3",
+        "symfony/http-foundation": "^6.4 || ^7.3",
+        "symfony/http-kernel": "^6.4 || ^7.3",
+        "symfony/routing": "^6.4 || ^7.3",
         "symfony-cmf/routing": "^3.0"
     },
     "autoload": {
@@ -46,6 +45,16 @@
         "contao-manager-plugin": "InspiredMinds\\ContaoSimpleNewsUrls\\ContaoManager\\Plugin"
     },
     "require-dev": {
-        "friendsofphp/php-cs-fixer": "^3.0"
+        "contao/easy-coding-standard": "^6.0",
+        "contao/rector": "^1.0",
+        "maglnet/composer-require-checker": "^4.0"
+    },
+    "config": {
+        "allow-plugins": {
+            "contao/manager-plugin": true,
+            "contao-components/installer": true,
+            "php-http/discovery": false,
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
     }
 }
